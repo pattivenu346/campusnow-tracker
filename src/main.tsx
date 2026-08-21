@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { clearSession, createTask, deleteTask, downloadData, getSession, getStore, getUser, normaliseDeadlines, saveSession, saveStore, updateTask as persistTask, validateImport } from './storage';
 import type { Priority, Status, Store, Task, User } from './types';
 import './styles.css';
+import { loadSharedTasks, removeSharedTask, saveSharedTask, sharedEnabled } from './supabase';
 
 type IconProps = { size?: number };
 const glyph = (children:string) => ({size}:IconProps) => <span aria-hidden="true" className="glyph" style={size?{fontSize:size}:undefined}>{children}</span>;
@@ -16,14 +17,16 @@ function overdue(t:Task) { const today = new Date(); today.setHours(0,0,0,0); co
 function daysLate(t:Task) { return Math.max(1, Math.floor((Date.now()-new Date(`${t.deadline}T00:00:00`).getTime())/86400000)); }
 
 function App() {
- const [store,setStore]=useState<Store>(()=>getStore()); const [user,setUser]=useState<User|undefined>(()=>getUser(getStore().users,getSession()||'')); const [page,setPage]=useState('Dashboard'); const [query,setQuery]=useState(''); const [statusFilter,setStatusFilter]=useState<Status|''>(''); const [memberFilter,setMemberFilter]=useState(''); const [priorityFilter,setPriorityFilter]=useState<Priority|''>(''); const [modal,setModal]=useState<'create'|'edit'|null>(null); const [active,setActive]=useState<Task|undefined>(); const [toast,setToast]=useState(''); const [mobile,setMobile]=useState(false);
+ const [store,setStore]=useState<Store>(()=>getStore()); const [user,setUser]=useState<User|undefined>(()=>getUser(getStore().users,getSession()||'')); const [page,setPage]=useState('Dashboard'); const [query,setQuery]=useState(''); const [statusFilter,setStatusFilter]=useState<Status|''>(''); const [memberFilter,setMemberFilter]=useState(''); const [priorityFilter,setPriorityFilter]=useState<Priority|''>(''); const [modal,setModal]=useState<'create'|'edit'|null>(null); const [active,setActive]=useState<Task|undefined>(); const [toast,setToast]=useState(''); const [mobile,setMobile]=useState(false); const sharedIds=useRef<string[]>([]);
  const persist=(next:Store)=>{setStore(next);saveStore(next)};
+ useEffect(()=>{if(!sharedEnabled())return;loadSharedTasks().then(tasks=>{if(tasks)persist({...getStore(),tasks})}).catch(()=>setToast('Shared workspace unavailable.'));},[]);
  useEffect(()=>{ const update=()=>{ const current=getStore(); const {result,changed}=normaliseDeadlines(current.tasks); if(changed) { const n={...current,tasks:result}; persist(n); setToast('Overdue tasks were moved to backlog.'); }}; update(); addEventListener('focus',update); return()=>removeEventListener('focus',update); },[]);
  useEffect(()=>{if(toast){const t=setTimeout(()=>setToast(''),3000);return()=>clearTimeout(t)}},[toast]);
+ useEffect(()=>{if(!sharedEnabled())return;const ids=store.tasks.map(t=>t.id);sharedIds.current.filter(id=>!ids.includes(id)).forEach(id=>void removeSharedTask(id));sharedIds.current=ids;store.tasks.forEach(task=>void saveSharedTask(task));},[store.tasks]);
  if(!user) return <Login users={store.users} onLogin={u=>{saveSession(u.id);setUser(u)}} />;
  const isAdmin=user.role==='admin'; const visible=store.tasks.filter(t=>isAdmin||t.assignedTo===user.id).filter(t=>(!query||`${t.title} ${t.description} ${getUser(store.users,t.assignedTo)?.name} ${t.status}`.toLowerCase().includes(query.toLowerCase()))&&(!statusFilter||t.status===statusFilter)&&(!memberFilter||t.assignedTo===memberFilter)&&(!priorityFilter||t.priority===priorityFilter));
  const counts=(tasks:Task[])=>Object.fromEntries(STATUSES.map(s=>[s,tasks.filter(t=>t.status===s).length])) as Record<Status,number>;
- const updateTask=(task:Task)=>persist({...store,tasks:persistTask(store.tasks,task)});
+ const updateTask=(task:Task)=>{persist({...store,tasks:persistTask(store.tasks,task)});void saveSharedTask(task)};
  const move=(task:Task,status:Status)=>{if(!isAdmin && !allowed(task.status,status)) return; updateTask({...task,status,previousStatus:task.status,completedAt:status==='DONE'?new Date().toISOString():task.completedAt,submittedForReviewAt:status==='REVIEW'?new Date().toISOString():task.submittedForReviewAt});setToast(`Task moved to ${titleCase(status)}.`)};
  const nav=['Dashboard','Deadlines','Backlog','Todo','In Progress','Review','Done',...(isAdmin?['Team','Manage Tasks','Data']:[])];
  const content=<Page page={page} tasks={visible} allTasks={store.tasks} users={store.users} admin={isAdmin} counts={counts(visible)} onMove={move} onEdit={t=>{setActive(t);setModal('edit')}} onCreate={()=>{setActive(undefined);setModal('create')}} onPage={setPage} onImport={x=>{if(confirm('This will replace current local data. Continue?')){persist(x);setToast('Data imported successfully.')}}} onExport={()=>downloadData(store)} />;
