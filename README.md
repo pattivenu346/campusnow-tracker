@@ -16,7 +16,16 @@ npm run build
 npm run preview
 ```
 
-Vercel can deploy this repository using its normal Vite detection and build command (`npm run build`). No environment variables, backend, or database are required.
+## Vercel deployment
+
+This project is configured for Vercel in `vercel.json`. No environment variables, backend, or database are required.
+
+1. Push this folder to a GitHub, GitLab, or Bitbucket repository.
+2. In Vercel, choose **Add New → Project** and import the repository.
+3. Vercel detects the Vite setup. Keep the build command as `npm run build` and output directory as `dist`.
+4. Click **Deploy**.
+
+The site is fully static, so it can also be deployed by connecting a Vercel project to the repository through the normal Git deployment flow. `npm ci` is safe to use because `package-lock.json` is committed.
 
 ## Default accounts
 
