@@ -1,6 +1,8 @@
 import type { Task } from './types';
 const url=import.meta.env.VITE_SUPABASE_URL as string|undefined,key=import.meta.env.VITE_SUPABASE_ANON_KEY as string|undefined;
-const h=()=>({apikey:key!,Authorization:`Bearer ${key!}`,'Content-Type':'application/json'}); export const sharedEnabled=()=>Boolean(url&&key);
+// New Supabase publishable keys are opaque browser keys. Supplying them only
+// through apikey lets PostgREST apply the anonymous RLS role correctly.
+const h=()=>({apikey:key!,'Content-Type':'application/json'}); export const sharedEnabled=()=>Boolean(url&&key);
 const from=(r:Record<string,unknown>):Task=>({id:r.id as string,title:r.title as string,description:r.description as string,assignedTo:r.assigned_to as string,deadline:r.deadline as string,createdAt:r.created_at as string,updatedAt:r.updated_at as string,status:r.status as Task['status'],priority:r.priority as Task['priority'],notes:r.notes as string,completedAt:r.completed_at as string|null,previousStatus:r.previous_status as Task['previousStatus'],movedToBacklogAt:r.moved_to_backlog_at as string|null,submittedForReviewAt:r.submitted_for_review_at as string|null});
 export async function loadSharedTasks(){if(!sharedEnabled())return null;const r=await fetch(`${url}/rest/v1/tasks?select=*`,{headers:h()});if(!r.ok)throw Error();return(await r.json() as Record<string,unknown>[]).map(from)}
 export async function saveSharedTask(t:Task){if(!sharedEnabled())return;const r={id:t.id,title:t.title,description:t.description,assigned_to:t.assignedTo,deadline:t.deadline,created_at:t.createdAt,updated_at:t.updatedAt,status:t.status,priority:t.priority,notes:t.notes,completed_at:t.completedAt,previous_status:t.previousStatus,moved_to_backlog_at:t.movedToBacklogAt,submitted_for_review_at:t.submittedForReviewAt};await fetch(`${url}/rest/v1/tasks?on_conflict=id`,{method:'POST',headers:{...h(),Prefer:'resolution=merge-duplicates'},body:JSON.stringify(r)})}
