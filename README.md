@@ -35,6 +35,10 @@ Accounts and display names are configured in `src/data.ts`. The workspace delibe
 
 ## Storage and security
 
+## Shared Supabase workspace
+
+To enable shared tasks across team devices, run `supabase/schema.sql` in the Supabase SQL Editor, then add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to Vercel. See `.env.example` for the required names. The app falls back to local browser storage until both values are configured.
+
 All state is saved to this browser’s `localStorage` under `teamTaskTrackerData`; the session is stored under `taskTrackerSession`. This means data is **not shared across browsers or devices**, and authentication is suitable only for a local demo/internal workflow—not real security.
 
 Administrators can use **Data** to export the workspace to `team-task-tracker-backup.json` and import it in another browser. Import replaces the current local workspace after confirmation.
