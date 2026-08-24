@@ -12,3 +12,50 @@ header{background:rgba(255,255,255,.68);backdrop-filter:blur(14px);border-bottom
 .task-card{background:rgba(255,255,255,.77);border-color:rgba(71,19,150,.10);border-radius:12px;box-shadow:0 5px 15px rgba(9,0,64,.045)}.task-card:hover{box-shadow:0 12px 26px rgba(71,19,150,.13);border-color:rgba(177,59,255,.25)}.task-card h3{color:var(--ink)}.priority.MEDIUM{background:#f1ddff;color:#7f1caf}.priority.HIGH{background:#fff0c6;color:#835e00}.priority.URGENT{background:#ffe0f3;color:#a2166f}.move{background:#eee9ff;color:var(--violet)}.move:hover{background:var(--violet);color:#fff}.admin-move button{background:#f0ebfb;color:var(--violet)}.admin-move button:hover{background:#dfd2fb}.empty-mini{color:#897fa5}.team-table{border-radius:14px}.table-title{border-bottom-color:var(--line)}th{color:#74678f}td{color:#433b5e}.member-avatar,.avatar{background:#e8dcff;color:var(--violet)}.primary{background:linear-gradient(135deg,var(--violet),var(--lilac));box-shadow:0 7px 16px rgba(71,19,150,.20)}.primary:hover{background:linear-gradient(135deg,#351078,#9e2ee5)}.secondary{background:#eee9f9;color:var(--violet)}.modal{background:rgba(255,255,255,.93);border:1px solid var(--line);backdrop-filter:blur(16px)}.modal-wrap{background:rgba(9,0,64,.55)}.toast{background:var(--ink)}.login{background:radial-gradient(circle at 20% 10%,rgba(177,59,255,.19),transparent 30%),radial-gradient(circle at 85% 90%,rgba(255,204,0,.15),transparent 30%),var(--canvas)}.login-card{background:rgba(255,255,255,.78);border-color:var(--line);backdrop-filter:blur(14px);box-shadow:0 20px 50px rgba(9,0,64,.11)}
 @media(max-width:1280px){.board{grid-template-columns:repeat(5,260px)}}
 @media(max-width:720px){header{backdrop-filter:blur(10px)}.column{min-height:360px}.board{grid-template-columns:repeat(5,minmax(82vw,1fr));gap:12px}.stat{background:rgba(255,255,255,.75)}}
+
+/* ===== Multi-assign & Teams (v2) ===== */
+.avatar-stack{display:flex;align-items:center;gap:0;flex-wrap:wrap}
+.mini-avatar{width:24px;height:24px;border-radius:50%;background:#e8dcff;color:var(--violet);display:inline-grid;place-items:center;font-size:10px;font-weight:700;flex-shrink:0}
+.avatar-stack .mini-avatar{margin-right:-6px;border:2px solid rgba(255,255,255,.85);position:relative;z-index:1}
+.avatar-stack .mini-avatar:nth-child(2){z-index:2}.avatar-stack .mini-avatar:nth-child(3){z-index:3}
+.avatar-stack .mini-avatar.more{background:#f0ebfb;color:#6959dc;font-size:9px;margin-left:2px;z-index:0}
+.assignee-name{margin-left:8px;font-weight:600;color:#443964;white-space:nowrap}
+.assign-section{margin-top:11px}
+.assign-label{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#58657a;font-weight:700;margin-bottom:4px}
+.assign-count{color:var(--lilac);font-weight:700;font-size:11px}
+.team-btns{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+.team-btn{font-size:11px;font-weight:700;padding:5px 11px;border-radius:20px;background:transparent;border:2px solid var(--tc,#6366f1);color:var(--tc,#6366f1);display:inline-flex;align-items:center;gap:5px;transition:.18s}
+.team-btn small{font-weight:500;opacity:.7;font-size:10px}
+.team-btn.active{background:var(--tc,#6366f1);color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.team-btn:hover{transform:scale(1.03);opacity:.9}
+.member-pills{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 8px}
+.member-pill{font-size:11px;font-weight:600;background:#ede9fe;color:var(--violet);padding:3px 4px 3px 9px;border-radius:14px;display:inline-flex;align-items:center;gap:3px;animation:pillIn .18s ease}
+.member-pill button{background:none;font-size:14px;color:inherit;padding:0 3px;line-height:1;opacity:.55;border:0;cursor:pointer}
+.member-pill button:hover{opacity:1}
+@keyframes pillIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.checkbox-list{max-height:190px;overflow-y:auto;border:1px solid var(--line);border-radius:9px;margin-top:4px;background:rgba(255,255,255,.5);display:grid;grid-template-columns:1fr 1fr;gap:1px}
+.modal label.checkbox-item{display:flex;align-items:center;gap:9px;padding:7px 10px;cursor:pointer;font-size:12px;font-weight:600;color:#344158;margin:0;border:0;transition:.12s;background:rgba(255,255,255,.3)}
+.modal label.checkbox-item:hover{background:rgba(99,102,241,.07)}
+.checkbox-item input[type="checkbox"]{accent-color:var(--lilac);width:15px;height:15px;cursor:pointer;flex-shrink:0}
+.checkbox-item .mini-avatar{width:20px;height:20px;font-size:8px}
+.teams-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:15px}
+.team-card{background:var(--glass);border:1px solid var(--line);border-radius:13px;overflow:hidden;box-shadow:0 5px 18px rgba(9,0,64,.05);transition:.2s}
+.team-card:hover{box-shadow:0 12px 28px rgba(71,19,150,.13);transform:translateY(-2px)}
+.team-color-bar{height:5px}
+.team-card-body{padding:16px 18px}
+.team-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.team-card-head h3{font-size:15px;letter-spacing:-.01em}
+.team-card-actions{display:flex;gap:2px}
+.team-card-actions .icon{color:#8994a8;padding:4px;border-radius:6px;transition:.15s}
+.team-card-actions .icon:hover{color:var(--violet);background:rgba(71,19,150,.08)}
+.team-members-row{display:flex;gap:5px;margin-bottom:8px;flex-wrap:wrap}
+.team-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-right:4px;white-space:nowrap}
+.team-cell{text-align:left!important;min-width:100px}
+.color-picker{display:flex;gap:9px;margin:6px 0 14px}
+.color-swatch{width:30px;height:30px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:.18s}
+.color-swatch.active{border-color:var(--ink);transform:scale(1.18);box-shadow:0 4px 12px rgba(0,0,0,.22)}
+.color-swatch:hover{transform:scale(1.12)}
+.assign-section .form-grid{grid-template-columns:repeat(3,1fr)}
+.meta{align-items:center}
+.meta .late{white-space:nowrap}
+@media(max-width:720px){.teams-grid{grid-template-columns:1fr}.team-btns{gap:5px}.team-btn{font-size:10px;padding:4px 8px}.checkbox-list{grid-template-columns:1fr;max-height:180px}.member-pills{gap:4px}.assign-section .form-grid{grid-template-columns:1fr}}
